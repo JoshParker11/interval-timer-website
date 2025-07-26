@@ -1,0 +1,23 @@
+{
+  "name": "interval-timer-website",
+  "version": "1.0.0",
+  "description": "This website implements the simple interval timer that I can't seem to find anywhere. This is part of the \"Road to $1\" series.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JoshParker11/interval-timer-website.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/JoshParker11/interval-timer-website/issues"
+  },
+  "homepage": "https://github.com/JoshParker11/interval-timer-website#readme",
+  "devDependencies": {
+    "vite": "^7.0.6"
+  }
+}

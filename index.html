@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interval Timer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            max-width: 500px;
+            width: 90%;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 2rem;
+            background: linear-gradient(45deg, #4facfe, #00f2fe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+
+        .setup-section {
+            margin-bottom: 2rem;
+        }
+
+        .input-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #b0b0b0;
+            font-weight: 500;
+        }
+
+        input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        /* Custom styling for number input spinners */
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
+
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+            background: linear-gradient(45deg, #4facfe, #00f2fe);
+            width: 20px;
+            height: 100%;
+            border-radius: 0 10px 10px 0;
+            cursor: pointer;
+            position: relative;
+        }
+
+        /* For Firefox */
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
+
+        /* Custom spinner buttons overlay */
+        .input-group {
+            position: relative;
+        }
+
+        .spinner-buttons {
+            position: absolute;
+            right: 0px;
+            top: calc(1.5rem + 3px);
+            display: block;
+            height: 44px;
+            width: 30px;
+        }
+
+        .spinner-btn {
+            background: linear-gradient(45deg, #4facfe, #00f2fe);
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 8px;
+            font-weight: bold;
+            height: calc(50% - 1px);
+            width: 100%;
+            display: block;
+            line-height: 1;
+            padding: 0;
+            margin: 0;
+            min-height: 0;
+            transition: all 0.2s ease;
+            user-select: none;
+            overflow: hidden;
+        }
+
+        .spinner-btn:first-child {
+            border-radius: 0 7px 0 0;
+            margin-bottom: 2px;
+        }
+
+        .spinner-btn:last-child {
+            border-radius: 0 0 7px 0;
+        }
+
+        .spinner-btn:hover {
+            background: linear-gradient(45deg, #00f2fe, #4facfe);
+            transform: scale(1.05);
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #4facfe;
+            box-shadow: 0 0 0 2px rgba(79, 172, 254, 0.2);
+        }
+
+        .timer-display {
+            text-align: center;
+            margin: 2rem 0;
+        }
+
+        .time {
+            font-size: 4rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .status {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #4facfe;
+            font-weight: 600;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            color: #b0b0b0;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4facfe, #00f2fe);
+            transition: width 1s linear;
+            border-radius: 4px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #4facfe, #00f2fe);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-danger {
+            background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
+            color: white;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .pulse {
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .exercise-phase {
+            background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .rest-phase {
+            background: linear-gradient(45deg, #4facfe, #00f2fe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .round-rest-phase {
+            background: linear-gradient(45deg, #feca57, #ff9ff3);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Interval Timer</h1>
+        
+        <div id="setupSection" class="setup-section">
+            <div class="input-group">
+                <label for="exerciseTime">Exercise Duration (seconds)</label>
+                <input type="number" id="exerciseTime" value="30" min="1">
+                <div class="spinner-buttons">
+                    <button class="spinner-btn" onclick="changeValue('exerciseTime', 1)">▲</button>
+                    <button class="spinner-btn" onclick="changeValue('exerciseTime', -1)">▼</button>
+                </div>
+            </div>
+            
+            <div class="input-group">
+                <label for="restTime">Rest Between Intervals (seconds)</label>
+                <input type="number" id="restTime" value="15" min="0">
+                <div class="spinner-buttons">
+                    <button class="spinner-btn" onclick="changeValue('restTime', 1)">▲</button>
+                    <button class="spinner-btn" onclick="changeValue('restTime', -1)">▼</button>
+                </div>
+            </div>
+            
+            <div class="input-group">
+                <label for="intervals">Number of Intervals per Round</label>
+                <input type="number" id="intervals" value="8" min="1">
+                <div class="spinner-buttons">
+                    <button class="spinner-btn" onclick="changeValue('intervals', 1)">▲</button>
+                    <button class="spinner-btn" onclick="changeValue('intervals', -1)">▼</button>
+                </div>
+            </div>
+            
+            <div class="input-group">
+                <label for="rounds">Number of Rounds</label>
+                <input type="number" id="rounds" value="3" min="1">
+                <div class="spinner-buttons">
+                    <button class="spinner-btn" onclick="changeValue('rounds', 1)">▲</button>
+                    <button class="spinner-btn" onclick="changeValue('rounds', -1)">▼</button>
+                </div>
+            </div>
+            
+            <div class="input-group">
+                <label for="roundRest">Rest Between Rounds (seconds)</label>
+                <input type="number" id="roundRest" value="60" min="0">
+                <div class="spinner-buttons">
+                    <button class="spinner-btn" onclick="changeValue('roundRest', 1)">▲</button>
+                    <button class="spinner-btn" onclick="changeValue('roundRest', -1)">▼</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="timerSection" class="timer-display hidden">
+            <div class="time" id="timeDisplay">00:30</div>
+            <div class="status" id="statusDisplay">Ready to Start</div>
+            
+            <div class="progress-info">
+                <span>Round: <span id="currentRound">1</span>/<span id="totalRounds">3</span></span>
+                <span>Interval: <span id="currentInterval">1</span>/<span id="totalIntervals">8</span></span>
+            </div>
+            
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button id="startBtn" class="btn-primary">Start Timer</button>
+            <button id="pauseBtn" class="btn-secondary hidden">Pause</button>
+            <button id="resetBtn" class="btn-danger">Reset</button>
+        </div>
+
+        <!-- Buy Me a Coffee Section -->
+        <div style="text-align: center; margin-top: 2rem; padding-top: 1rem; border-top: 1px solid rgba(255, 255, 255, 0.1);">
+            <p style="color: #b0b0b0; font-size: 0.9rem; margin-bottom: 1rem;">Enjoying the timer?</p>
+            <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/buymeacoffee-js/1.0.0/index.js"></script>
+            <div id="bmc-wbtn" style="display: inline-block;">
+                <a href="https://www.buymeacoffee.com/yourusername" target="_blank" style="
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 0.5rem;
+                    padding: 0.75rem 1.5rem;
+                    background: linear-gradient(45deg, #FFDD00, #FF813F);
+                    color: #000;
+                    text-decoration: none;
+                    border-radius: 10px;
+                    font-weight: 600;
+                    transition: all 0.3s ease;
+                    box-shadow: 0 4px 15px rgba(255, 129, 63, 0.3);
+                " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(255, 129, 63, 0.4)'" 
+                   onmouseout="this.style.transform='translateY(0px)'; this.style.boxShadow='0 4px 15px rgba(255, 129, 63, 0.3)'">
+                    <span style="font-size: 1.2rem;">☕</span>
+                    <span>Buy me a coffee</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=GA_MEASUREMENT_ID"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'GA_MEASUREMENT_ID');
+        
+        // Custom event tracking
+        function trackEvent(action, category = 'Timer', label = '') {
+            gtag('event', action, {
+                event_category: category,
+                event_label: label
+            });
+        }
+    </script>
+
+    <script>
+        // Utility function for custom spinner buttons
+        function changeValue(inputId, change) {
+            const input = document.getElementById(inputId);
+            const currentValue = parseInt(input.value) || 0;
+            const minValue = parseInt(input.min) || 0;
+            const newValue = Math.max(minValue, currentValue + change);
+            input.value = newValue;
+            
+            // Track analytics
+            if (typeof trackEvent === 'function') {
+                trackEvent('input_change', 'Settings', `${inputId}: ${newValue}`);
+            }
+        }
+
+        class IntervalTimer {
+            constructor() {
+                this.isRunning = false;
+                this.isPaused = false;
+                this.currentTime = 0;
+                this.currentRound = 1;
+                this.currentInterval = 1;
+                this.phase = 'ready'; // ready, exercise, rest, roundRest, complete
+                this.timer = null;
+                this.totalDuration = 0;
+                this.elapsedSeconds = 0; // Track total elapsed seconds
+                
+                this.audioContext = null;
+                this.initAudio();
+                this.bindEvents();
+                this.updateDisplay();
+            }
+
+            initAudio() {
+                try {
+                    this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                } catch (e) {
+                    console.log('Audio not supported');
+                }
+            }
+
+            playBeep(frequency = 800, duration = 200) {
+                if (!this.audioContext) return;
+                
+                const oscillator = this.audioContext.createOscillator();
+                const gainNode = this.audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(this.audioContext.destination);
+                
+                oscillator.frequency.value = frequency;
+                oscillator.type = 'sine';
+                
+                gainNode.gain.setValueAtTime(0.3, this.audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + duration / 1000);
+                
+                oscillator.start(this.audioContext.currentTime);
+                oscillator.stop(this.audioContext.currentTime + duration / 1000);
+            }
+
+            bindEvents() {
+                document.getElementById('startBtn').addEventListener('click', () => this.start());
+                document.getElementById('pauseBtn').addEventListener('click', () => this.pause());
+                document.getElementById('resetBtn').addEventListener('click', () => this.reset());
+            }
+
+            getSettings() {
+                return {
+                    exerciseTime: parseInt(document.getElementById('exerciseTime').value),
+                    restTime: parseInt(document.getElementById('restTime').value),
+                    intervals: parseInt(document.getElementById('intervals').value),
+                    rounds: parseInt(document.getElementById('rounds').value),
+                    roundRest: parseInt(document.getElementById('roundRest').value)
+                };
+            }
+
+            start() {
+                if (this.isPaused) {
+                    this.resume();
+                    return;
+                }
+
+                const settings = this.getSettings();
+                this.settings = settings;
+                
+                // Calculate total workout duration at start
+                this.totalDuration = this.calculateTotalDuration(settings);
+                this.elapsedSeconds = 0;
+                
+                // Track analytics
+                if (typeof trackEvent === 'function') {
+                    trackEvent('timer_start', 'Timer', `${settings.rounds}x${settings.intervals} intervals`);
+                }
+                
+                this.currentTime = settings.exerciseTime;
+                this.currentRound = 1;
+                this.currentInterval = 1;
+                this.phase = 'exercise';
+                this.isRunning = true;
+                
+                document.getElementById('setupSection').classList.add('hidden');
+                document.getElementById('timerSection').classList.remove('hidden');
+                document.getElementById('startBtn').classList.add('hidden');
+                document.getElementById('pauseBtn').classList.remove('hidden');
+                
+                document.getElementById('totalRounds').textContent = settings.rounds;
+                document.getElementById('totalIntervals').textContent = settings.intervals;
+                
+                this.playBeep(1000, 300);
+                this.updateDisplay();
+                this.tick();
+            }
+
+            calculateTotalDuration(settings) {
+                let totalTime = 0;
+                
+                for (let round = 1; round <= settings.rounds; round++) {
+                    // Add all intervals in this round
+                    for (let interval = 1; interval <= settings.intervals; interval++) {
+                        totalTime += settings.exerciseTime;
+                        
+                        // Add rest after interval (except last interval of each round)
+                        if (interval < settings.rounds) {
+                            totalTime += settings.restTime;
+                        }
+                    }
+                    
+                    // Add round rest after every round except the very last one
+                    if (round < settings.rounds) {
+                        totalTime += settings.roundRest;
+                    }
+                }
+                
+                console.log('Total calculated duration:', totalTime, 'seconds');
+                return totalTime;
+            }
+
+            pause() {
+                this.isPaused = true;
+                this.isRunning = false;
+                clearInterval(this.timer);
+                
+                document.getElementById('startBtn').classList.remove('hidden');
+                document.getElementById('pauseBtn').classList.add('hidden');
+                document.getElementById('startBtn').textContent = 'Resume';
+            }
+
+            resume() {
+                this.isPaused = false;
+                this.isRunning = true;
+                
+                document.getElementById('startBtn').classList.add('hidden');
+                document.getElementById('pauseBtn').classList.remove('hidden');
+                
+                this.tick();
+            }
+
+            reset() {
+                this.isRunning = false;
+                this.isPaused = false;
+                clearInterval(this.timer);
+                
+                this.currentTime = 0;
+                this.currentRound = 1;
+                this.currentInterval = 1;
+                this.phase = 'ready';
+                this.elapsedSeconds = 0;
+                this.totalDuration = 0;
+                
+                document.getElementById('setupSection').classList.remove('hidden');
+                document.getElementById('timerSection').classList.add('hidden');
+                document.getElementById('startBtn').classList.remove('hidden');
+                document.getElementById('pauseBtn').classList.add('hidden');
+                document.getElementById('startBtn').textContent = 'Start Timer';
+                
+                this.updateDisplay();
+            }
+
+            tick() {
+                this.timer = setInterval(() => {
+                    this.currentTime--;
+                    this.elapsedSeconds++; // Increment total elapsed time
+                    this.updateDisplay();
+                    
+                    if (this.currentTime <= 3 && this.currentTime > 0) {
+                        this.playBeep(800, 150);
+                    }
+                    
+                    if (this.currentTime <= 0) {
+                        this.nextPhase();
+                    }
+                }, 1000);
+            }
+
+            nextPhase() {
+                const settings = this.settings;
+                
+                if (this.phase === 'exercise') {
+                    if (settings.restTime > 0) {
+                        this.phase = 'rest';
+                        this.currentTime = settings.restTime;
+                        this.playBeep(600, 200);
+                    } else {
+                        this.nextInterval();
+                    }
+                } else if (this.phase === 'rest') {
+                    this.nextInterval();
+                } else if (this.phase === 'roundRest') {
+                    this.currentRound++;
+                    this.currentInterval = 1;
+                    this.phase = 'exercise';
+                    this.currentTime = settings.exerciseTime;
+                    this.playBeep(1000, 300);
+                }
+                
+                this.updateDisplay();
+            }
+
+            nextInterval() {
+                const settings = this.settings;
+                
+                if (this.currentInterval < settings.intervals) {
+                    this.currentInterval++;
+                    this.phase = 'exercise';
+                    this.currentTime = settings.exerciseTime;
+                    this.playBeep(1000, 200);
+                } else if (this.currentRound < settings.rounds) {
+                    // Round completed, check if we need round rest
+                    if (settings.roundRest > 0) {
+                        this.phase = 'roundRest';
+                        this.currentTime = settings.roundRest;
+                        this.playBeep(400, 400);
+                    } else {
+                        this.currentRound++;
+                        this.currentInterval = 1;
+                        this.phase = 'exercise';
+                        this.currentTime = settings.exerciseTime;
+                        this.playBeep(1000, 300);
+                    }
+                } else {
+                    // All rounds and intervals completed
+                    this.complete();
+                }
+            }
+
+            complete() {
+                this.isRunning = false;
+                clearInterval(this.timer);
+                this.phase = 'complete';
+                
+                // Track analytics
+                if (typeof trackEvent === 'function') {
+                    trackEvent('timer_complete', 'Timer', `${this.settings.rounds}x${this.settings.intervals} completed`);
+                }
+                
+                this.playBeep(1200, 500);
+                setTimeout(() => this.playBeep(1200, 500), 200);
+                setTimeout(() => this.playBeep(1200, 500), 400);
+                
+                this.updateDisplay();
+            }
+
+            formatTime(seconds) {
+                const mins = Math.floor(seconds / 60);
+                const secs = seconds % 60;
+                return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+            }
+
+            getStatusText() {
+                switch (this.phase) {
+                    case 'ready': return 'Ready to Start';
+                    case 'exercise': return 'EXERCISE!';
+                    case 'rest': return 'Rest';
+                    case 'roundRest': return 'Round Break';
+                    case 'complete': return 'Workout Complete!';
+                    default: return 'Ready';
+                }
+            }
+
+            getPhaseClass() {
+                switch (this.phase) {
+                    case 'exercise': return 'exercise-phase';
+                    case 'rest': return 'rest-phase';
+                    case 'roundRest': return 'round-rest-phase';
+                    default: return '';
+                }
+            }
+
+            calculateProgress() {
+                if (!this.totalDuration || this.phase === 'ready') return 0;
+                if (this.phase === 'complete') return 100;
+                
+                return Math.min(100, (this.elapsedSeconds / this.totalDuration) * 100);
+            }
+
+            updateDisplay() {
+                const timeDisplay = document.getElementById('timeDisplay');
+                const statusDisplay = document.getElementById('statusDisplay');
+                const currentRoundDisplay = document.getElementById('currentRound');
+                const currentIntervalDisplay = document.getElementById('currentInterval');
+                const progressFill = document.getElementById('progressFill');
+                
+                if (timeDisplay) {
+                    timeDisplay.textContent = this.formatTime(this.currentTime);
+                    timeDisplay.className = `time ${this.getPhaseClass()}`;
+                    
+                    if (this.phase === 'exercise' && this.isRunning) {
+                        timeDisplay.classList.add('pulse');
+                    } else {
+                        timeDisplay.classList.remove('pulse');
+                    }
+                }
+                
+                if (statusDisplay) {
+                    statusDisplay.textContent = this.getStatusText();
+                    statusDisplay.className = `status ${this.getPhaseClass()}`;
+                }
+                
+                if (currentRoundDisplay) {
+                    currentRoundDisplay.textContent = this.currentRound;
+                }
+                
+                if (currentIntervalDisplay) {
+                    currentIntervalDisplay.textContent = this.currentInterval;
+                }
+                
+                if (progressFill) {
+                    const progress = this.calculateProgress();
+                    progressFill.style.width = `${progress}%`;
+                    console.log(`Progress: ${progress.toFixed(1)}% (${this.elapsedSeconds}/${this.totalDuration}s) - Phase: ${this.phase}, Round: ${this.currentRound}, Interval: ${this.currentInterval}`);
+                }
+            }
+        }
+
+        // Initialize the timer when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new IntervalTimer();
+        });
+    </script>
+</body>
+</html>
